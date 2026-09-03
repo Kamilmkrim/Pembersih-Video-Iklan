@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>StreamClean — Pemutar & Pembersih Link Video</title>
+
+  <!-- Open Graph & Meta SEO -->
+  <meta name="description" content="Pembersih link video online. Sadap stream murni (.m3u8/.mp4), putar bebas iklan, dan kirim instan ke Telegram." />
+  <meta name="theme-color" content="#060913" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- RemixIcon -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+
+  <!-- Plyr.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+
+  <!-- Custom Mobile-First CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- MOBILE-FIRST APP CONTAINER -->
+  <div class="mobile-app-wrapper">
+    
+    <!-- Sticky App Header -->
+    <header class="mobile-header">
+      <div class="header-row">
+        <a href="/" class="brand">
+          <div class="brand-icon">
+            <i class="ri-shield-flash-fill"></i>
+          </div>
+          <span class="brand-title">StreamClean</span>
+        </a>
+        <div class="status-indicator">
+          <span class="pulse-dot"></span>
+          <span>Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+
+      <!-- Compact Mobile Hero -->
+      <section class="mobile-hero">
+        <h1>Bersihkan Link, <br /><span class="text-gradient">Putar Tanpa Iklan</span></h1>
+        <p>Bypass iklan jebakan & popup. Tambahkan hingga 5 link dalam satu antrian aman.</p>
+      </section>
+
+      <!-- Mobile Input & Queue Builder Card -->
+      <section class="app-card">
+        
+        <!-- Input Row (Luas Penuh & Leluasa) -->
+        <div class="input-box">
+          <i class="ri-link-m input-icon"></i>
+          <input 
+            type="url" 
+            id="urlInput" 
+            class="mobile-text-input" 
+            placeholder="Tempel atau ketik link video..." 
+            autocomplete="off" 
+          />
+          <button type="button" id="btnPaste" class="btn-paste" title="Tempel otomatis dari clipboard">
+            <i class="ri-clipboard-line"></i> <span>Tempel</span>
+          </button>
+        </div>
+
+        <!-- Tombol Tambah ke Antrian Terpisah (Lebar Penuh) -->
+        <button type="button" id="btnAddLink" class="btn-add-queue-bar">
+          <i class="ri-add-circle-line ri-lg"></i>
+          <span>Tambahkan ke Antrian</span>
+        </button>
+
+        <!-- Queue Status Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding: 0 0.2rem;">
+          <span style="font-size: 0.775rem; color: var(--text-secondary); font-weight: 600;">
+            Antrian: <b id="queueCountText" style="color: #38bdf8;">0 / 5 Link</b>
+          </span>
+          <button type="button" id="btnClearQueue" style="display: none; background: transparent; border: none; color: #f87171; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: none; align-items: center; gap: 0.25rem;">
+            <i class="ri-delete-bin-line"></i> Kosongkan
+          </button>
+        </div>
+
+        <!-- Visual Queue List (1 to 5 Links) -->
+        <div id="queueList" class="queue-list"></div>
+
+        <!-- Submit & Process Button -->
+        <button type="button" id="btnProcessQueue" class="btn-submit-mobile" disabled style="margin-top: 0.75rem;">
+          <i class="ri-magic-line ri-lg" id="btnIcon"></i>
+          <span id="btnText">Tambahkan Link Terlebih Dahulu</span>
+        </button>
+
+        <!-- Quick Samples Bar -->
+        <div class="sample-bar">
+          <span class="sample-label">Tes:</span>
+          <button type="button" class="chip btn-sample" data-url="https://video.idola.cc/dewi-kiran-hijab-suka-pamer/">
+            + video.idola.cc
+          </button>
+          <button type="button" class="chip btn-sample" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+            + M3U8 Live
+          </button>
+          <button type="button" class="chip btn-sample" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
+            + Direct MP4
+          </button>
+        </div>
+
+        <!-- Batch Progress Bar & Live Status -->
+        <div id="batchProgressBox" class="batch-progress-wrapper">
+          <div class="batch-progress-header">
+            <span id="batchStatusText"><i class="ri-loader-4-line ri-spin"></i> Mempersiapkan antrian...</span>
+            <span id="batchCounterText" style="font-weight: 700; color: #38bdf8;">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="batchProgressBar" class="progress-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS FEED (CONTAINER UNTUK BANYAK HASIL VIDEO) -->
+      <section id="resultsSection" style="display: none;">
+        
+        <!-- Batch Action Header (Muncul jika ada lebih dari 1 video) -->
+        <div id="batchSummaryBar" class="batch-summary-header" style="display: none;">
+          <span id="totalResultsBadge" style="font-size: 0.75rem; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25); padding: 4px 10px; border-radius: 8px;">
+            ✅ 0 Video Siap
+          </span>
+          <button type="button" id="btnSendAllTelegram" class="btn-action-mobile" style="font-size: 0.775rem; padding: 0.45rem 0.85rem; background: linear-gradient(135deg, #229ED9, #0284c7); color: white; border: none;">
+            <i class="ri-telegram-fill" id="tgAllIcon"></i> <span id="tgAllText">Kirim Semua ke Telegram</span>
+          </button>
+        </div>
+
+        <!-- Feed List of Cinema Video Cards -->
+        <div id="resultsFeed" class="results-feed"></div>
+
+      </section>
+
+      <!-- Minimal App Footer -->
+      <footer class="mobile-footer">
+        <p>&copy; <%= new Date().getFullYear() %> StreamClean — 100% Client-Side Stream Proxy</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <i class="ri-checkbox-circle-fill" style="color: var(--success); font-size: 1.15rem;"></i>
+    <span id="toastMsg">Tautan berhasil ditambahkan!</span>
+  </div>
+
+  <!-- Scripts: Hls.js & Plyr.js -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.min.js"></script>
+
+  <script>
+    const MAX_QUEUE_LIMIT = 5;
+    let urlQueue = [];
+
+    const urlInput = document.getElementById('urlInput');
+    const btnPaste = document.getElementById('btnPaste');
+    const btnAddLink = document.getElementById('btnAddLink');
+    const queueCountText = document.getElementById('queueCountText');
+    const btnClearQueue = document.getElementById('btnClearQueue');
+    const queueList = document.getElementById('queueList');
+
+    const btnProcessQueue = document.getElementById('btnProcessQueue');
+    const btnIcon = document.getElementById('btnIcon');
+    const btnText = document.getElementById('btnText');
+
+    const batchProgressBox = document.getElementById('batchProgressBox');
+    const batchStatusText = document.getElementById('batchStatusText');
+    const batchCounterText = document.getElementById('batchCounterText');
+    const batchProgressBar = document.getElementById('batchProgressBar');
+
+    const resultsSection = document.getElementById('resultsSection');
+    const batchSummaryBar = document.getElementById('batchSummaryBar');
+    const totalResultsBadge = document.getElementById('totalResultsBadge');
+    const btnSendAllTelegram = document.getElementById('btnSendAllTelegram');
+    const tgAllIcon = document.getElementById('tgAllIcon');
+    const tgAllText = document.getElementById('tgAllText');
+    const resultsFeed = document.getElementById('resultsFeed');
+    const toast = document.getElementById('toast');
+
+    // Kumpulan video yang sukses diproses pada sesi ini
+    let currentBatchVideos = [];
+
+    // Tampilkan Toast
+    function showToast(msg) {
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Ambil domain dari string URL
+    function getDomainName(rawUrl) {
+      try {
+        const u = new URL(rawUrl);
+        return u.hostname;
+      } catch (e) {
+        return 'video link';
+      }
+    }
+
+    // Render Ulang Daftar Antrian Visual
+    function renderQueueUI() {
+      queueList.innerHTML = '';
+      const count = urlQueue.length;
+
+      queueCountText.innerText = `${count} / ${MAX_QUEUE_LIMIT} Link`;
+      btnClearQueue.style.display = count > 0 ? 'inline-flex' : 'none';
+
+      urlQueue.forEach((url, idx) => {
+        const item = document.createElement('div');
+        item.className = 'queue-item';
+        item.innerHTML = `
+          <span class="queue-number">${idx + 1}</span>
+          <div class="queue-url-info">
+            <span class="queue-url-domain">${getDomainName(url)}</span>
+            <span class="queue-url-full">${url}</span>
+          </div>
+          <button type="button" class="btn-remove-queue" data-index="${idx}" title="Hapus dari antrian">
+            <i class="ri-close-line"></i>
+          </button>
+        `;
+        queueList.appendChild(item);
+      });
+
+      // Event listener tombol hapus per item
+      queueList.querySelectorAll('.btn-remove-queue').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const indexToRemove = parseInt(btn.dataset.index, 10);
+          urlQueue.splice(indexToRemove, 1);
+          renderQueueUI();
+          showToast('Link dihapus dari antrian');
+        });
+      });
+
+      // Update State Tombol Submit Utama
+      if (count === 0) {
+        btnProcessQueue.disabled = true;
+        btnText.innerText = 'Tambahkan Link Terlebih Dahulu';
+      } else if (count === 1) {
+        btnProcessQueue.disabled = false;
+        btnText.innerText = '✨ Bersihkan 1 Video';
+      } else {
+        btnProcessQueue.disabled = false;
+        btnText.innerText = `⚡ Bersihkan ${count} Video (Antrian Aman)`;
+      }
+    }
+
+    // Tambah Link ke Antrian
+    function addUrlToQueue(raw) {
+      let url = (raw || urlInput.value).trim();
+      if (!url) {
+        showToast('Silakan tempel atau ketik link video!');
+        return;
+      }
+
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      try {
+        new URL(url);
+      } catch (e) {
+        showToast('Format tautan tidak valid!');
+        return;
+      }
+
+      // Cek apakah kuota maksimal 5 sudah penuh
+      if (urlQueue.length >= MAX_QUEUE_LIMIT) {
+        alert(`Perhatian:\nMaksimal ${MAX_QUEUE_LIMIT} link video dalam satu antrian demi menjaga performa server!`);
+        return;
+      }
+
+      // Cek duplikasi di dalam antrian
+      if (urlQueue.includes(url)) {
+        showToast('Link ini sudah ada di dalam antrian!');
+        return;
+      }
+
+      urlQueue.push(url);
+      urlInput.value = '';
+      renderQueueUI();
+      showToast(`Link ke-${urlQueue.length} berhasil ditambahkan!`);
+      urlInput.focus();
+    }
+
+    // Event tombol tambah & Enter di input
+    btnAddLink.addEventListener('click', () => addUrlToQueue());
+
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addUrlToQueue();
+      }
+    });
+
+    // Tombol Paste dari Clipboard
+    btnPaste.addEventListener('click', async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            urlInput.value = text.trim();
+            addUrlToQueue(text.trim());
+          } else {
+            showToast('Clipboard masih kosong');
+          }
+        } else {
+          urlInput.focus();
+        }
+      } catch (err) {
+        urlInput.focus();
+      }
+    });
+
+    // Tombol Kosongkan Antrian
+    btnClearQueue.addEventListener('click', () => {
+      urlQueue = [];
+      renderQueueUI();
+      showToast('Seluruh antrian dikosongkan');
+      urlInput.focus();
+    });
+
+    // Tombol Sample Demo
+    document.querySelectorAll('.btn-sample').forEach(btn => {
+      btn.addEventListener('click', () => {
+        addUrlToQueue(btn.dataset.url);
+      });
+    });
+
+    // Inisialisasi Player pada kartu video tertentu
+    function setupPlayerForCard(cardId, streamUrl, streamType) {
+      const videoElement = document.getElementById(`player-${cardId}`);
+      if (!videoElement) return;
+
+      if (streamType === 'm3u8' && Hls.isSupported()) {
+        const hls = new Hls({
+          enableWorker: false,
+          lowLatencyMode: false,
+        });
+        hls.loadSource(streamUrl);
+        hls.attachMedia(videoElement);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          new Plyr(videoElement, {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'fullscreen'],
+            autoplay: false,
+          });
+        });
+
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+            else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+            else hls.destroy();
+          }
+        });
+      } else {
+        videoElement.src = streamUrl;
+        new Plyr(videoElement, {
+          controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'fullscreen'],
+          autoplay: false,
+        });
+      }
+    }
+
+    // Buat & Pasang Kartu Hasil Video ke dalam Feed (Muncul Satu per Satu)
+    function appendVideoCard(data) {
+      const card = document.createElement('div');
+      card.className = 'results-card';
+      card.style.display = 'block';
+      card.id = `card-${data.id}`;
+
+      card.innerHTML = `
+        <div class="mobile-player-box">
+          <video id="player-${data.id}" playsinline controls></video>
+        </div>
+        <div class="results-body">
+          <div class="video-header-row">
+            <h2 class="video-title">${data.title || 'VIDEO RANDOM'}</h2>
+            <span class="badge-format">${(data.streamType || 'STREAM').toUpperCase()}</span>
+          </div>
+
+          <button type="button" class="btn-telegram-mobile" id="btnTg-${data.id}" data-id="${data.id}">
+            <i class="ri-telegram-fill ri-lg" id="iconTg-${data.id}"></i>
+            <span id="textTg-${data.id}">Kirim ke Telegram</span>
+          </button>
+
+          <div class="action-grid-mobile">
+            <button type="button" class="btn-action-mobile btn-copy-card" data-url="${data.shareUrl}">
+              <i class="ri-file-copy-line"></i> Salin Link
+            </button>
+            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent((data.title || 'VIDEO RANDOM') + '\n' + data.shareUrl)}" target="_blank" class="btn-action-mobile btn-whatsapp-mobile">
+              <i class="ri-whatsapp-fill"></i> WhatsApp
+            </a>
+          </div>
+
+          <div class="share-link-bar">
+            <i class="ri-link-m" style="color: var(--text-muted); font-size: 0.95rem;"></i>
+            <input type="text" value="${data.shareUrl}" class="share-link-text" readonly />
+            <button type="button" class="btn-copy-mini btn-copy-card" data-url="${data.shareUrl}">
+              <i class="ri-file-copy-line"></i> Salin
+            </button>
+          </div>
+
+          <a href="${data.shareUrl}" target="_blank" class="btn-action-mobile" style="width: 100%; justify-content: center; font-size: 0.8rem; padding: 0.65rem; opacity: 0.85;">
+            <i class="ri-external-link-line"></i> Buka Halaman Bioskop Penuh
+          </a>
+        </div>
+      `;
+
+      resultsFeed.appendChild(card);
+
+      // Inisialisasi pemutar video pada kartu yang baru dibuat
+      setupPlayerForCard(data.id, data.proxyStreamUrl, data.streamType);
+
+      // Pasang Event Listener Tombol Kirim Telegram
+      const btnTg = card.querySelector(`#btnTg-${data.id}`);
+      btnTg.addEventListener('click', () => sendSingleTelegram(data.id));
+
+      // Pasang Event Listener Salin Link
+      card.querySelectorAll('.btn-copy-card').forEach(b => {
+        b.addEventListener('click', () => {
+          navigator.clipboard.writeText(b.dataset.url);
+          showToast('Tautan berhasil disalin!');
+        });
+      });
+    }
+
+    // Buat Kartu Gagal jika 1 link bermasalah
+    function appendErrorCard(url, message) {
+      const card = document.createElement('div');
+      card.className = 'app-card';
+      card.style.background = 'rgba(239, 68, 68, 0.08)';
+      card.style.border = '1px solid rgba(239, 68, 68, 0.25)';
+      card.style.padding = '1rem';
+
+      card.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+          <i class="ri-error-warning-fill" style="color: var(--danger); font-size: 1.25rem; flex-shrink: 0; margin-top: 2px;"></i>
+          <div style="font-size: 0.825rem; line-height: 1.4;">
+            <b style="color: #fca5a5;">Gagal Menyadap Link:</b>
+            <div style="color: var(--text-muted); font-family: monospace; font-size: 0.75rem; word-break: break-all; margin: 0.2rem 0;">${url}</div>
+            <span style="color: #fecaca;">${message || 'Format video tidak didukung'}</span>
+          </div>
+        </div>
+      `;
+      resultsFeed.appendChild(card);
+    }
+
+    // Kirim 1 Video ke Telegram
+    async function sendSingleTelegram(videoId) {
+      const btn = document.getElementById(`btnTg-${videoId}`);
+      const icon = document.getElementById(`iconTg-${videoId}`);
+      const text = document.getElementById(`textTg-${videoId}`);
+
+      if (!btn) return;
+      btn.disabled = true;
+      icon.className = 'spinner';
+      text.innerText = 'Mengirim...';
+
+      try {
+        const res = await fetch('/api/send-telegram', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: videoId }),
+        });
+        const result = await res.json();
+
+        if (!result.success) {
+          if (result.needStart) {
+            alert('Perhatian Bot Telegram:\n\n' + result.message);
+          } else {
+            throw new Error(result.message || 'Gagal mengirim ke Telegram.');
+          }
+          return;
+        }
+
+        showToast('✅ Berhasil dikirim ke Telegram!');
+      } catch (err) {
+        alert('Gagal mengirim ke Telegram: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        icon.className = 'ri-telegram-fill ri-lg';
+        text.innerText = 'Kirim ke Telegram';
+      }
+    }
+
+    // Kirim SEMUA Video ke Telegram
+    btnSendAllTelegram.addEventListener('click', async () => {
+      if (currentBatchVideos.length === 0) return;
+
+      btnSendAllTelegram.disabled = true;
+      tgAllIcon.className = 'spinner';
+      tgAllText.innerText = 'Mengirim antrian...';
+
+      let successCount = 0;
+      for (let i = 0; i < currentBatchVideos.length; i++) {
+        const v = currentBatchVideos[i];
+        tgAllText.innerText = `Mengirim ${i + 1}/${currentBatchVideos.length}...`;
+        try {
+          const res = await fetch('/api/send-telegram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: v.id }),
+          });
+          const result = await res.json();
+          if (result.success) successCount++;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      btnSendAllTelegram.disabled = false;
+      tgAllIcon.className = 'ri-telegram-fill';
+      tgAllText.innerText = 'Kirim Semua ke Telegram';
+      showToast(`✅ ${successCount} video berhasil terkirim ke Telegram!`);
+    });
+
+    // =========================================================================
+    // MESIN EKSEKUSI ANTRIAN (MAKSIMAL 5 VIDEO - BERURUTAN SATU PER SATU)
+    // =========================================================================
+    btnProcessQueue.addEventListener('click', async () => {
+      if (urlQueue.length === 0) {
+        showToast('Silakan tambahkan minimal 1 link ke antrian!');
+        return;
+      }
+
+      const activeQueue = [...urlQueue];
+      const total = activeQueue.length;
+
+      // Reset feed
+      resultsFeed.innerHTML = '';
+      currentBatchVideos = [];
+      resultsSection.style.display = 'block';
+
+      // State tombol loading
+      btnProcessQueue.disabled = true;
+      btnIcon.className = 'spinner';
+      btnText.innerText = 'Memproses Antrian...';
+
+      batchProgressBox.style.display = 'flex';
+      batchProgressBar.style.width = '0%';
+
+      let successCount = 0;
+
+      // PROSES SATU PER SATU SECARA AMAN (ANTI-TIMEOUT)
+      for (let i = 0; i < total; i++) {
+        const currentUrl = activeQueue[i];
+        const progressPercent = Math.round(((i) / total) * 100);
+
+        batchStatusText.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> Menyadap video ${i + 1} dari ${total}...`;
+        batchCounterText.innerText = `${progressPercent}%`;
+        batchProgressBar.style.width = `${progressPercent}%`;
+
+        try {
+          const response = await fetch('/api/clean', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: currentUrl,
+              title: 'VIDEO RANDOM',
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            successCount++;
+            currentBatchVideos.push(data);
+            // LANGSUNG TAMPILKAN KARTU KE LAYAR!
+            appendVideoCard(data);
+          } else {
+            appendErrorCard(currentUrl, data.message);
+          }
+        } catch (err) {
+          appendErrorCard(currentUrl, err.message);
+        }
+
+        // Scroll halus ke kartu pertama
+        const lastCard = resultsFeed.lastElementChild;
+        if (lastCard && i === 0) {
+          lastCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+
+      // Selesai Semua
+      batchProgressBar.style.width = '100%';
+      batchCounterText.innerText = '100%';
+      batchStatusText.innerHTML = `<i class="ri-checkbox-circle-fill" style="color: var(--success);"></i> Selesai! Berhasil memproses ${successCount} dari ${total} video.`;
+
+      // Jika ada lebih dari 1 video sukses, tampilkan tombol "Kirim Semua ke Telegram"
+      if (successCount > 1) {
+        batchSummaryBar.style.display = 'flex';
+        totalResultsBadge.innerText = `✅ ${successCount} Video Siap`;
+      } else {
+        batchSummaryBar.style.display = 'none';
+      }
+
+      btnProcessQueue.disabled = false;
+      btnIcon.className = 'ri-magic-line ri-lg';
+      
+      // Kosongkan antrian input setelah proses selesai
+      urlQueue = [];
+      renderQueueUI();
+
+      showToast(`Proses selesai! ${successCount} video siap ditonton.`);
+    });
+
+    // Inisialisasi awal UI antrian
+    renderQueueUI();
+  </script>
+</body>
+</html>

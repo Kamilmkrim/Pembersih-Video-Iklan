@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#grad)" />
+  <circle cx="400" cy="225" r="50" fill="url(#btnGrad)" opacity="0.9" />
+  <polygon points="390,205 425,225 390,245" fill="#ffffff" />
+  <text x="400" y="320" fill="#94a3b8" font-family="sans-serif" font-size="20" font-weight="600" text-anchor="middle">Video Stream Clean</text>
+</svg>

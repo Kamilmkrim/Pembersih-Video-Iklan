@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <% if (!notFound && video) { %>
+    <!-- Server-Side Rendered (SSR) Page Title -->
+    <title><%= video.title %> — StreamClean Player</title>
+    
+    <!-- SSR Open Graph Meta Tags (WhatsApp, Telegram, Facebook, Discord, dll) -->
+    <meta property="og:type" content="video.other" />
+    <meta property="og:site_name" content="StreamClean" />
+    <meta property="og:title" content="<%= video.title %>" />
+    <meta property="og:description" content="<%= video.description %>" />
+    <meta property="og:image" content="<%= video.thumbnail %>" />
+    <meta property="og:image:secure_url" content="<%= video.thumbnail %>" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:url" content="<%= shareUrl %>" />
+    <meta property="og:video" content="<%= proxyStreamUrl %>" />
+    <meta property="og:video:secure_url" content="<%= proxyStreamUrl %>" />
+    <meta property="og:video:type" content="<%= video.streamType === 'm3u8' ? 'application/x-mpegURL' : 'video/mp4' %>" />
+    <meta property="og:video:width" content="1280" />
+    <meta property="og:video:height" content="720" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="player" />
+    <meta name="twitter:site" content="@StreamClean" />
+    <meta name="twitter:title" content="<%= video.title %>" />
+    <meta name="twitter:description" content="<%= video.description %>" />
+    <meta name="twitter:image" content="<%= video.thumbnail %>" />
+    <meta name="twitter:player" content="<%= shareUrl %>" />
+    <meta name="twitter:player:width" content="1280" />
+    <meta name="twitter:player:height" content="720" />
+  <% } else { %>
+    <title>Video Tidak Ditemukan — StreamClean</title>
+  <% } %>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Plyr.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+
+  <!-- App Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- MOBILE-FIRST APP CONTAINER -->
+  <div class="mobile-app-wrapper">
+    
+    <!-- Sticky App Header -->
+    <header class="mobile-header">
+      <div class="header-row">
+        <a href="/" class="brand">
+          <div class="brand-icon">
+            <i class="ri-shield-flash-fill"></i>
+          </div>
+          <span class="brand-title">StreamClean</span>
+        </a>
+        <a href="/" class="btn-paste" style="text-decoration: none;">
+          <i class="ri-add-line"></i> <span>Bersihkan Lagi</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+      <% if (notFound || !video) { %>
+        <!-- 404 Video State -->
+        <div class="app-card" style="text-align: center; padding: 3rem 1.5rem;">
+          <div style="display: inline-flex; width: 60px; height: 60px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); align-items: center; justify-content: center; color: var(--danger); margin-bottom: 1rem;">
+            <i class="ri-film-line ri-2x"></i>
+          </div>
+          <h2 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Video Tidak Ditemukan</h2>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            Tautan ini tidak ditemukan di database atau ID video salah.
+          </p>
+          <a href="/" class="btn-submit-mobile" style="text-decoration: none;">
+            <i class="ri-arrow-left-line"></i> Kembali ke Beranda
+          </a>
+        </div>
+      <% } else { %>
+        <!-- Cinema Theater Card -->
+        <div class="results-card" style="display: block;">
+          <div class="mobile-player-box">
+            <video id="player" playsinline controls poster="<%= video.thumbnail %>"></video>
+          </div>
+
+          <div class="results-body">
+            <div class="video-header-row">
+              <h1 class="video-title"><%= video.title %></h1>
+              <span class="badge-format"><%= video.streamType.toUpperCase() %></span>
+            </div>
+
+            <!-- 2-Column Action Grid -->
+            <div class="action-grid-mobile">
+              <button type="button" id="btnCopyShare" class="btn-action-mobile">
+                <i class="ri-file-copy-line"></i> Salin Link
+              </button>
+              <a 
+                href="https://api.whatsapp.com/send?text=<%= encodeURIComponent(video.title + '\n' + shareUrl) %>" 
+                target="_blank" 
+                class="btn-action-mobile btn-whatsapp-mobile"
+              >
+                <i class="ri-whatsapp-fill"></i> WhatsApp
+              </a>
+            </div>
+
+            <div class="share-link-bar">
+              <i class="ri-link-m" style="color: var(--text-muted);"></i>
+              <input type="text" value="<%= shareUrl %>" class="share-link-text" readonly />
+              <button type="button" onclick="navigator.clipboard.writeText('<%= shareUrl %>'); document.getElementById('toast').classList.add('show'); setTimeout(() => document.getElementById('toast').classList.remove('show'), 2500);" class="btn-copy-mini">
+                <i class="ri-file-copy-line"></i> Salin
+              </button>
+            </div>
+
+            <% if (video.description) { %>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;"><%= video.description %></p>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Minimal Footer -->
+      <footer class="mobile-footer">
+        <p>&copy; <%= new Date().getFullYear() %> StreamClean — 100% Client-Side Media Proxy</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <i class="ri-check-line" style="color: var(--success); font-size: 1.2rem;"></i>
+    <span>Tautan berhasil disalin ke clipboard!</span>
+  </div>
+
+  <% if (!notFound && video) { %>
+    <!-- Scripts for Plyr and HLS -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.min.js"></script>
+    <script>
+      const videoElement = document.getElementById('player');
+      const streamUrl = <%- JSON.stringify(proxyStreamUrl) %>;
+      const streamType = <%- JSON.stringify(video.streamType) %>;
+
+      let plyr = null;
+      let hls = null;
+
+      if (streamType === 'm3u8' && Hls.isSupported()) {
+        hls = new Hls({
+          enableWorker: false,
+          lowLatencyMode: false,
+          backBufferLength: 60,
+        });
+
+        hls.loadSource(streamUrl);
+        hls.attachMedia(videoElement);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          plyr = new Plyr(videoElement, {
+            controls: [
+              'play-large',
+              'play',
+              'progress',
+              'current-time',
+              'duration',
+              'mute',
+              'volume',
+              'captions',
+              'settings',
+              'pip',
+              'airplay',
+              'fullscreen'
+            ],
+            autoplay: false,
+          });
+        });
+
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          console.warn('HLS Event Error:', data);
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls.recoverMediaError();
+                break;
+              default:
+                hls.destroy();
+                break;
+            }
+          }
+        });
+      } else {
+        videoElement.src = streamUrl;
+        plyr = new Plyr(videoElement);
+      }
+
+      // Tombol Salin Link
+      const btnCopyShare = document.getElementById('btnCopyShare');
+      const toast = document.getElementById('toast');
+      btnCopyShare.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          showToast();
+        } catch (err) {
+          const temp = document.createElement('input');
+          temp.value = window.location.href;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand('copy');
+          document.body.removeChild(temp);
+          showToast();
+        }
+      });
+
+      function showToast() {
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+    </script>
+  <% } %>
+
+</body>
+</html>
