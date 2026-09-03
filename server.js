@@ -140,13 +140,15 @@ app.post('/api/clean', async (req, res) => {
     const existing = findVideoByOriginalUrl(url);
     if (existing) {
       console.log(`[Database] Mengambil data permanen yang sudah ada (ID: ${existing.id})`);
+      existing.title = 'VIDEO RANDOM'; // Selalu default VIDEO RANDOM
+      saveDatabase();
       const shareUrl = buildShareUrl(req, existing.id);
       const proxyStreamUrl = `/proxy-stream?id=${existing.id}`;
 
       return res.json({
         success: true,
         id: existing.id,
-        title: existing.title,
+        title: 'VIDEO RANDOM',
         thumbnail: existing.thumbnail,
         description: existing.description,
         streamType: existing.streamType,
@@ -161,10 +163,10 @@ app.post('/api/clean', async (req, res) => {
     // Buat ID permanen konsisten berdasarkan URL sumber (tidak berubah-ubah lagi!)
     const id = generatePermanentId(url);
 
-    // Simpan ke database permanen (Nama Default: VIDEO RANDOM)
+    // Simpan ke database permanen (Nama Default Wajib: VIDEO RANDOM)
     const record = {
       id,
-      title: (req.body.title && req.body.title.trim()) ? req.body.title.trim() : 'VIDEO RANDOM',
+      title: 'VIDEO RANDOM',
       thumbnail: videoData.thumbnail,
       description: videoData.description,
       videoUrl: videoData.videoUrl,
@@ -183,7 +185,7 @@ app.post('/api/clean', async (req, res) => {
     return res.json({
       success: true,
       id,
-      title: record.title,
+      title: 'VIDEO RANDOM',
       thumbnail: record.thumbnail,
       description: record.description,
       streamType: record.streamType,
@@ -219,10 +221,15 @@ app.get('/watch/:id', (req, res) => {
   const shareUrl = buildShareUrl(req, id);
   const proxyStreamUrl = `/proxy-stream?id=${id}`;
 
+  const displayVideo = {
+    ...video,
+    title: 'VIDEO RANDOM',
+  };
+
   // Render Server-Side Rendered (SSR) dengan Open Graph tags
   res.render('player', {
     notFound: false,
-    video,
+    video: displayVideo,
     shareUrl,
     proxyStreamUrl,
   });
@@ -509,7 +516,7 @@ app.post('/api/send-telegram', async (req, res) => {
     const shareUrl = buildShareUrl(req, id);
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
 
-    const displayTitle = (video && video.title && video.title !== 'Video Tanpa Judul') ? video.title : 'VIDEO RANDOM';
+    const displayTitle = 'VIDEO RANDOM';
     const caption = `🎬 <b>${displayTitle}</b>\n\n` +
       `📝 <i>${video.description || 'Tonton video bersih tanpa iklan dan gangguan.'}</i>\n\n` +
       `⚡ <b>Link Tontonan Bersih:</b>\n` +

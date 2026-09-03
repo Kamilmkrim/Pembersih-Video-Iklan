@@ -388,7 +388,7 @@
         </div>
         <div class="results-body">
           <div class="video-header-row">
-            <h2 class="video-title">${data.title || 'VIDEO RANDOM'}</h2>
+            <h2 class="video-title">VIDEO RANDOM</h2>
             <span class="badge-format">${(data.streamType || 'STREAM').toUpperCase()}</span>
           </div>
 
@@ -401,7 +401,7 @@
             <button type="button" class="btn-action-mobile btn-copy-card" data-url="${data.shareUrl}">
               <i class="ri-file-copy-line"></i> Salin Link
             </button>
-            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent((data.title || 'VIDEO RANDOM') + '\n' + data.shareUrl)}" target="_blank" class="btn-action-mobile btn-whatsapp-mobile">
+            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('VIDEO RANDOM\n' + data.shareUrl)}" target="_blank" class="btn-action-mobile btn-whatsapp-mobile">
               <i class="ri-whatsapp-fill"></i> WhatsApp
             </a>
           </div>
