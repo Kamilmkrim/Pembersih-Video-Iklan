@@ -96,19 +96,6 @@
           <span id="btnText">Tambahkan Link Terlebih Dahulu</span>
         </button>
 
-        <!-- Quick Samples Bar -->
-        <div class="sample-bar">
-          <span class="sample-label">Tes:</span>
-          <button type="button" class="chip btn-sample" data-url="https://video.idola.cc/dewi-kiran-hijab-suka-pamer/">
-            + video.idola.cc
-          </button>
-          <button type="button" class="chip btn-sample" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
-            + M3U8 Live
-          </button>
-          <button type="button" class="chip btn-sample" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
-            + Direct MP4
-          </button>
-        </div>
 
         <!-- Batch Progress Bar & Live Status -->
         <div id="batchProgressBox" class="batch-progress-wrapper">
@@ -332,12 +319,6 @@
       urlInput.focus();
     });
 
-    // Tombol Sample Demo
-    document.querySelectorAll('.btn-sample').forEach(btn => {
-      btn.addEventListener('click', () => {
-        addUrlToQueue(btn.dataset.url);
-      });
-    });
 
     // Inisialisasi Player pada kartu video tertentu
     function setupPlayerForCard(cardId, streamUrl, streamType) {
